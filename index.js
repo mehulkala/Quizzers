@@ -3,11 +3,14 @@ import bodyParser from "body-parser";
 import pg from "pg";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+import bcrypt from "bcrypt";
+
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = 3000;
+const saltRounds = 10;
 
 const db = new pg.Client({
     user: "postgres",
@@ -51,7 +54,15 @@ app.post("/quiz-type", async (req, res)=>{
 
 app.post("/signup", async (req, res)=>{
     try{
-    await db.query("INSERT INTO teacher_details (email, pass, total_quiz) VALUES ($1, $2, $3)", [req.body["email"], req.body["password"], 0]);
+        //hashing password
+    bcrypt.hash(req.body.password, saltRounds, async(err, hash)=>{
+        if(err){
+            console.log("Error hasing password: ", err);
+        }else{
+        await db.query("INSERT INTO teacher_details (email, pass, total_quiz) VALUES ($1, $2, $3)", [req.body["email"], hash, 0]);
+        }    
+    });
+
     //once signup is completed redirect to login page
     res.redirect("/teacher-login.html");
     }
@@ -66,13 +77,17 @@ let teacher_id;
 //here we get email and password for teacher login
 app.post("/login", async (req, res)=>{
     const input = req.body["email"];
-    
+    const loginPassword = req.body["password"];
     let  total_quiz_created;
     try{
-        
         const output = await db.query("SELECT id, pass, total_quiz FROM teacher_details WHERE email=$1", [input]);
-        if(output.rows[0]["pass"]===req.body["password"]){
-            teacher_id = output.rows[0]["id"];
+        const storedHashedPassword = output.rows[0]["pass"];
+        bcrypt.compare(loginPassword, storedHashedPassword, async(err, result)=>{
+            if(err){
+                console.log("Error comparing passwords: ", err);
+            }else{
+                if(result){
+                    teacher_id = output.rows[0]["id"];
             total_quiz_created = output.rows[0]["total_quiz"];
             const all_quizzes = await db.query("SELECT * FROM quiz_lists WHERE teacher_id = $1", [teacher_id]);
             // console.log(all_quizzes);
@@ -81,12 +96,27 @@ app.post("/login", async (req, res)=>{
                 total_quiz_created: total_quiz_created,
                 all_quizzes:all_quizzes
             });    
-        }
-        else{
-            // err.message("You entered Incorrect password!");
-            // console.log(err);
-            res.redirect("/teacher-login.html");
-        }
+                }else{
+                    res.redirect("/teacher-login.html");
+                }
+            }
+        })
+        // if(output.rows[0]["pass"]===req.body["password"]){
+        //     teacher_id = output.rows[0]["id"];
+        //     total_quiz_created = output.rows[0]["total_quiz"];
+        //     const all_quizzes = await db.query("SELECT * FROM quiz_lists WHERE teacher_id = $1", [teacher_id]);
+        //     // console.log(all_quizzes);
+        //     res.render("teacher-dashboard.ejs", {
+        //         teacher_id: teacher_id,
+        //         total_quiz_created: total_quiz_created,
+        //         all_quizzes:all_quizzes
+        //     });    
+        // }
+        // else{
+        //     // err.message("You entered Incorrect password!");
+        //     // console.log(err);
+        //     res.redirect("/teacher-login.html");
+        // }
     }
     catch(err){
         // err.message("Such email doesn't exist");
