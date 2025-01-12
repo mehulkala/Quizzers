@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background: #121212;
+      color: #d0d0d0;
+    }
+    
+    header {
+      background: #1e1e1e;
+      color: #e6ff00;
+      padding: 20px;
+      text-align: center;
+      font-size: 36px;
+      text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5), 0px 0px 20px rgba(255, 255, 255, 0.5);
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #181818;
+      border-radius: 8px;
+    }
+
+    section {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      color: #ff007f;
+    }
+
+    h3 {
+      color: #00ff99;
+    }
+
+    footer {
+      background: #1e1e1e;
+      color: #aaa;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      border-top: 2px solid #444;
+      text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.2);
+    }
+
+    #results-container {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    p {
+      margin: 10px 0;
+      color: #d0d0d0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Quiz Results</h1>
+  </header>
+  <main>
+    <section id="results-container">
+      <h2>Results Summary</h2>
+      <p>Score: <%=score%>/<%=total%></p>
+      <p>Accuracy: <%=accuracy*100%>%</p>
+      <!-- <p>Rank: 3/50</p> -->
+      
+      <br />
+      <h3>Correct Answers</h3>
+      
+      <%if (correct_answers.length===0){%>
+        <p>You didn't get any Question Right. Study harder next time!</p>
+      <%}else{%>
+        <%for(var i=0; i<correct_answers.length; i++){%>
+          <p>Question. <%=correct_questions[i]%> -> Answer. <%=correct_answers[i]%> </p>
+        <%}%>
+      <%}%>
+      <br />
+      <h3>Wrong Answers</h3>
+      <%if(wrong_answers.length===0){%>
+        <p>No Wrong Questions. Keep it Up!</p>
+      <%}else{%>
+        <%for(var i=0; i<wrong_answers.length; i++){%>
+          <p>Question. <%=wrong_questions[i]%> -> Answer. <%=wrong_answers[i]%> </p>
+        <%}%>
+      <%}%>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2024 Quizzers. All rights reserved.</p>
+  </footer>
+</body>
+</html>
