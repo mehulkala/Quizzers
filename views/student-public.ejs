@@ -22,7 +22,7 @@
             <%for(var i=0; i<quiz_data.rows.length; i++){%>
                 <li>
                   <form action="/quizcode" method="post">
-                    Quiz Name: <%=quiz_data.rows[i]["quiz_name"]%>   Subject: <%=quiz_data.rows[i]["subject"]%>   Ratings: <%=quiz_data.rows[i]["reviews"]%>  Total student attempts: <%=quiz_data.rows[i]["total_attempts"]%> 
+                    Quiz Name: <%=quiz_data.rows[i]["quiz_name"]%>  <br> Subject: <%=quiz_data.rows[i]["subject"]%> <br>  Ratings: <%=quiz_data.rows[i]["reviews"]%> <br> Total student attempts: <%=quiz_data.rows[i]["total_attempts"]%> 
                     <button type="submit" name="quiz-code" value="<%=quiz_data.rows[i]["id"]%>"> Start Quiz </button>
                   </form>
                 </li>

@@ -244,6 +244,9 @@ app.post("/quiz-submit", async(req, res)=>{
     });
 });
 
+app.post("/result-done", (req, res)=>{
+    res.redirect("/index.html");
+});
 
 app.post("/quizzes", async(req,res)=>{
     const quizdata = req.body;
