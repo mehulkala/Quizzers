@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import pg from "pg";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import dotenv from 'dotenv';
 import pkg from 'pg';
 const { Pool } = pkg;
