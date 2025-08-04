@@ -57,14 +57,22 @@ app.post("/quiz-type", async (req, res)=>{
 
 app.post("/signup", async (req, res)=>{
     try{
-        //hashing password
-    bcrypt.hash(req.body.password, saltRounds, async(err, hash)=>{
-        if(err){
-            console.log("Error hasing password: ", err);
-        }else{
-        await db.query("INSERT INTO teacher_details (email, pass, total_quiz) VALUES ($1, $2, $3)", [req.body["email"], hash, 0]);
-        }    
-    });
+
+    const saltRounds = parseInt(process.env.ROUNDS) || 10;
+    const hash = await bcrypt.hash(req.body.password, saltRounds);
+    await db.query(
+      "INSERT INTO teacher_details (email, pass, total_quiz) VALUES ($1, $2, $3)",
+      [req.body["email"], hash, 0]
+    );
+        
+    //     //hashing password
+    // bcrypt.hash(req.body.password, saltRounds, async(err, hash)=>{
+    //     if(err){
+    //         console.log("Error hasing password: ", err);
+    //     }else{
+    //     await db.query("INSERT INTO teacher_details (email, pass, total_quiz) VALUES ($1, $2, $3)", [req.body["email"], hash, 0]);
+    //     }    
+    // });
 
     //once signup is completed redirect to login page
     res.redirect("/teacher-login.html");
@@ -85,10 +93,7 @@ app.post("/login", async (req, res)=>{
     try{
         const output = await db.query("SELECT id, pass, total_quiz FROM teacher_details WHERE email=$1", [input]);
         const storedHashedPassword = output.rows[0]["pass"];
-        bcrypt.compare(loginPassword, storedHashedPassword, async(err, result)=>{
-            if(err){
-                console.log("Error comparing passwords: ", err);
-            }else{
+        const result = await bcrypt.compare(loginPassword, storedHashedPassword);
                 if(result){
                     teacher_id = output.rows[0]["id"];
             total_quiz_created = output.rows[0]["total_quiz"];
@@ -99,11 +104,7 @@ app.post("/login", async (req, res)=>{
                 total_quiz_created: total_quiz_created,
                 all_quizzes:all_quizzes
             });    
-                }else{
-                    res.redirect("/teacher-login.html");
                 }
-            }
-        })
 
     }
     catch(err){
