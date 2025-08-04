@@ -5,7 +5,9 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
 import dotenv from 'dotenv';
-import { Pool } from "pg";
+import pkg from 'pg';
+const { Pool } = pkg;
+
 
 dotenv.config();
 
