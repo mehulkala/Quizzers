@@ -4,22 +4,22 @@ import pg from "pg";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
+import dotenv from 'dotenv';
 
+dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-const port = 3000;
-const saltRounds = 10;
+const port = process.env.PORT || 3000;
+const saltRounds = process.env.ROUNDS;
 
-const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "quiz-project-updated",
-    password : "project",
-    port: 5432,
+const db = new pg.Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl:{
+        rejectUnauthorized: false
+    }
 });
-
 db.connect();
 
 app.use(express.json());
@@ -101,22 +101,7 @@ app.post("/login", async (req, res)=>{
                 }
             }
         })
-        // if(output.rows[0]["pass"]===req.body["password"]){
-        //     teacher_id = output.rows[0]["id"];
-        //     total_quiz_created = output.rows[0]["total_quiz"];
-        //     const all_quizzes = await db.query("SELECT * FROM quiz_lists WHERE teacher_id = $1", [teacher_id]);
-        //     // console.log(all_quizzes);
-        //     res.render("teacher-dashboard.ejs", {
-        //         teacher_id: teacher_id,
-        //         total_quiz_created: total_quiz_created,
-        //         all_quizzes:all_quizzes
-        //     });    
-        // }
-        // else{
-        //     // err.message("You entered Incorrect password!");
-        //     // console.log(err);
-        //     res.redirect("/teacher-login.html");
-        // }
+
     }
     catch(err){
         // err.message("Such email doesn't exist");
@@ -277,15 +262,6 @@ app.post("/quizzes", async(req,res)=>{
     var quiz_count = await db.query("SELECT total_quiz FROM teacher_details WHERE id = $1", [teacher_id]);
     quiz_count = (quiz_count.rows[0].total_quiz) + 1;
     await db.query("UPDATE teacher_details SET total_quiz = $1 WHERE id = $2", [quiz_count, teacher_id]);
-    
-    // const total_quiz_created = await db.query("SELECT * FROM teacher_details WHERE id = $1", [teacher_id]);
-    // const all_quizzes = await db.query("SELECT * FROM quiz_lists WHERE teacher_id = $1", [teacher_id]);
-    // // console.log(all_quizzes);
-    // res.render("teacher-dashboard.ejs", {
-    //     teacher_id: teacher_id, 
-    //     total_quiz_created:total_quiz_created.rows[0].total_quiz,
-    //     all_quizzes:all_quizzes
-    // });
 });
 
 app.post("/delete-quiz", async (req, res)=>{
