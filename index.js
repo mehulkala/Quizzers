@@ -5,6 +5,7 @@ import { dirname } from "path";
 import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
 import dotenv from 'dotenv';
+import { Pool } from "pg";
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const saltRounds = process.env.ROUNDS;
 
-const db = new pg.Pool({
+const db = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl:{
         rejectUnauthorized: false
